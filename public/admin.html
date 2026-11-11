@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Proctor Dashboard</title>
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+<body class="admin">
+  <header class="ad-top">
+    <div class="ad-brand"><img src="/assets/favicon.svg" alt="" width="26" height="26"><span id="brandName">Mock Exam</span><span class="ad-role">Proctor</span></div>
+    <nav class="ad-tabs" role="tablist">
+      <button type="button" role="tab" data-tab="live" aria-selected="true">Live <span class="tab-badge" id="alertBadge" hidden></span></button>
+      <button type="button" role="tab" data-tab="tests" aria-selected="false">Tests</button>
+      <button type="button" role="tab" data-tab="accounts" aria-selected="false">Accounts</button>
+    </nav>
+    <div class="ad-right">
+      <label class="sound-toggle"><input type="checkbox" id="soundOn" checked> Alert sound</label>
+      <a href="/home" class="ad-link">Take a test</a>
+      <button type="button" class="ad-link" id="signOut">Sign out</button>
+    </div>
+  </header>
+
+  <main class="ad-main">
+    <!-- LIVE -->
+    <section class="tab-panel" id="panel-live">
+      <div class="live-bar">
+        <div class="chips" id="chips"></div>
+        <div class="filters">
+          <select id="testFilter" aria-label="Filter by test"><option value="">All tests</option></select>
+          <label><input type="checkbox" id="hideDone"> Hide finished</label>
+          <span class="live-dot" id="liveDot" title="Live updates">● Live</span>
+        </div>
+      </div>
+      <div class="live-grid">
+        <div class="card table-card">
+          <table class="takers">
+            <thead><tr>
+              <th>Test taker</th><th>Test</th><th>Where they are</th><th>Time left</th><th>Answered</th><th>Left exam</th><th>Score</th><th>Last seen</th>
+            </tr></thead>
+            <tbody id="takers"><tr><td colspan="8" class="muted">Loading…</td></tr></tbody>
+          </table>
+        </div>
+        <aside class="card feed-card">
+          <div class="feed-head"><h2>Activity</h2><button type="button" class="ad-link small" id="clearAlerts">Mark all seen</button></div>
+          <ol class="feed" id="feed"></ol>
+        </aside>
+      </div>
+    </section>
+
+    <!-- TESTS -->
+    <section class="tab-panel" id="panel-tests" hidden>
+      <div class="card upload-card">
+        <h2>Add or update a test</h2>
+        <p class="muted">Upload a test file (.json). If a test with the same <code>id</code> already exists, you'll be asked before it's replaced. See <b>tests/FORMAT.md</b> for how to write one, or <button type="button" class="ad-link inline" id="dlTemplate">download a starter template</button>.</p>
+        <div class="upload-row">
+          <label class="file-btn"><input type="file" id="fileInput" accept=".json,application/json"><span>Choose file…</span></label>
+          <span id="fileName" class="muted">No file chosen</span>
+          <button type="button" class="ad-btn" id="pasteToggle">Paste JSON instead</button>
+        </div>
+        <textarea id="pasteBox" class="paste-box" placeholder='{ "title": "My Test", "sections": [ ... ] }' hidden></textarea>
+        <div class="upload-actions"><button type="button" class="ad-btn primary" id="uploadBtn" disabled>Upload test</button></div>
+        <ul class="errors" id="uploadErrors" hidden></ul>
+      </div>
+      <div id="testList" class="test-list"></div>
+    </section>
+
+    <!-- ACCOUNTS -->
+    <section class="tab-panel" id="panel-accounts" hidden>
+      <div class="card">
+        <h2>Add an account</h2>
+        <form class="acct-form" id="acctForm" autocomplete="off">
+          <label>Full name<input name="name" type="text" placeholder="Avery Jordan" required></label>
+          <label>Username<input name="username" type="text" placeholder="avery" required autocapitalize="none" spellcheck="false"></label>
+          <label>Password<span class="pw-row"><input name="password" type="text" required spellcheck="false"><button type="button" class="ad-btn" id="genPw">Generate</button></span></label>
+          <label>Role<select name="role"><option value="student">Test taker</option><option value="admin">Proctor</option></select></label>
+          <button type="submit" class="ad-btn primary">Add account</button>
+        </form>
+        <p class="muted small">Give each friend their username and password. You can also add accounts with SQL — see README, step 6.</p>
+      </div>
+      <div class="card">
+        <table class="accts"><thead><tr><th>Name</th><th>Username</th><th>Role</th><th>Last sign-in</th><th></th></tr></thead><tbody id="acctRows"></tbody></table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Detail drawer -->
+  <div class="drawer-wrap" id="drawerWrap" hidden>
+    <div class="drawer-shade" id="drawerShade"></div>
+    <aside class="drawer" id="drawer" role="dialog" aria-label="Test taker details"></aside>
+  </div>
+
+  <script src="/assets/js/config.js"></script>
+  <script src="/assets/js/common.js"></script>
+  <script src="/assets/js/admin.js"></script>
+</body>
+</html>

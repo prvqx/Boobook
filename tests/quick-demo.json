@@ -1,0 +1,48 @@
+{
+  "id": "quick-demo",
+  "title": "Quick Demo",
+  "subtitle": "2-minute sections and a 1-minute break, for trying out timers and breaks",
+  "sections": [
+    {
+      "title": "Section I",
+      "minutes": 2,
+      "breakAfterMinutes": 1,
+      "directions": "Section I has 3 multiple-choice questions and lasts 2 minutes. This short demo lets you see what happens when time runs out.",
+      "passages": {
+        "p": {
+          "heading": "Question 1. Read the following passage before you answer.",
+          "html": "This is a short placeholder passage. <span data-ref=\"r1\">The underlined sentence is the part of the passage the question refers to.</span> Everything else is just here to fill space."
+        }
+      },
+      "questions": [
+        {
+          "passage": "p",
+          "ref": "r1",
+          "prompt": "The underlined sentence» is best described as",
+          "choices": ["a summary", "the referenced text", "a question", "a footnote"],
+          "answer": "B"
+        },
+        {
+          "prompt": "What is 6 × 7?",
+          "choices": ["36", "42", "48", "54"],
+          "answer": "B"
+        },
+        {
+          "prompt": "Which planet is closest to the Sun?",
+          "choices": ["Venus", "Earth", "Mercury", "Mars"],
+          "answer": "C"
+        }
+      ]
+    },
+    {
+      "title": "Section II",
+      "minutes": 2,
+      "directions": "Section II has 1 free-response question and lasts 2 minutes.",
+      "questions": [
+        {
+          "prompt": "In a few sentences, describe your favorite place to study and explain why it works for you."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Home</title>
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/home.css">
+</head>
+<body class="home-page">
+  <header class="home-top">
+    <div class="home-top-in">
+      <div class="home-brand"><img src="/assets/favicon.svg" alt="" width="26" height="26"><span id="brandName">Mock Exam</span></div>
+      <div class="home-user"><span id="userName"></span><a href="/admin" id="adminLink" hidden>Proctor dashboard</a><button type="button" id="signOut">Sign Out</button></div>
+    </div>
+  </header>
+  <main class="home-main">
+    <h1 id="greeting">Welcome</h1>
+    <p class="home-sub">Your tests are below. Start a test only when your proctor tells you to.</p>
+    <h2>Your Tests</h2>
+    <div id="tests" class="test-grid"><div class="loading">Loading…</div></div>
+  </main>
+  <script src="/assets/js/config.js"></script>
+  <script src="/assets/js/common.js"></script>
+  <script src="/assets/js/home.js"></script>
+</body>
+</html>

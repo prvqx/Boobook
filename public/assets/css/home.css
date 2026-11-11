@@ -1,0 +1,35 @@
+.home-page { background: #f5f6f8; min-height: 100vh; }
+.home-top { background: #fff; border-bottom: 1px solid #e3e3e3; }
+.home-top-in { width: min(1080px, calc(100% - 48px)); margin: 0 auto; height: 64px; display: flex; align-items: center; justify-content: space-between; }
+.home-brand { display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 700; color: var(--indigo); }
+.home-user { display: flex; align-items: center; gap: 18px; font-size: 15px; }
+.home-user a { color: var(--indigo); font-weight: 500; }
+.home-user button { font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
+.home-main { width: min(1080px, calc(100% - 48px)); margin: 0 auto; padding: 40px 0 64px; }
+.home-main h1 { margin: 0; font-size: 34px; font-weight: 400; }
+.home-sub { margin: 8px 0 34px; color: #555; font-size: 16px; }
+.home-main h2 { margin: 0 0 16px; font-size: 21px; font-weight: 700; }
+.test-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+.loading, .empty { color: #666; font-size: 16px; padding: 24px 0; }
+.empty { background: #fff; border-radius: 12px; padding: 28px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+.test-card {
+  background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.08); overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.test-card .stripe { height: 6px; background: var(--indigo); }
+.test-card.done .stripe { background: #2e8b57; }
+.test-card.paused .stripe { background: #d18b00; }
+.tc-body { padding: 20px 22px 8px; flex: 1 1 auto; }
+.tc-title { margin: 0; font-size: 20px; font-weight: 700; line-height: 1.3; }
+.tc-sub { margin: 4px 0 0; color: #555; font-size: 14.5px; line-height: 1.4; }
+.tc-sections { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 6px; font-size: 14.5px; color: #333; }
+.tc-sections li { display: flex; justify-content: space-between; gap: 10px; border-top: 1px solid #eee; padding-top: 6px; }
+.tc-sections span:last-child { color: #666; white-space: nowrap; }
+.tc-foot { padding: 14px 22px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.tc-status { font-size: 14px; color: #555; }
+.tc-status b { color: #1e1e1e; }
+.badge-closed { display: inline-block; margin-left: 8px; font-size: 12px; font-weight: 700; color: #8a5a00; background: #fff1cf; border-radius: 4px; padding: 2px 6px; vertical-align: 2px; }
+.code-input {
+  width: 100%; height: 56px; text-align: center; font-size: 28px; letter-spacing: 10px; text-transform: uppercase;
+  border: 1.5px solid #8a8a8a; border-radius: 8px; font-weight: 700;
+}

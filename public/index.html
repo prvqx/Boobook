@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign In</title>
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="/assets/css/login.css">
+</head>
+<body class="login-page">
+  <div class="login-bg" aria-hidden="true">
+    <svg class="login-art" viewBox="0 0 1280 220" preserveAspectRatio="xMidYMax slice">
+      <g fill="none" stroke="#fff" stroke-width="3" opacity=".09">
+        <rect x="120" y="120" width="150" height="100" rx="8"/><path d="M150 150h90M150 172h90M150 194h60"/>
+        <circle cx="360" cy="168" r="34"/><path d="M360 146v22l14 10"/>
+        <rect x="470" y="96" width="120" height="124" rx="8"/><path d="M496 126h68M496 150h68M496 174h68M496 198h40"/>
+        <path d="M680 210l70-118 70 118z"/>
+        <rect x="900" y="112" width="96" height="108" rx="10"/><path d="M920 136h56M920 160h20M956 160h20M920 184h20M956 184h20"/>
+        <circle cx="1100" cy="150" r="46"/><path d="M1078 150l16 16 30-32"/>
+      </g>
+    </svg>
+  </div>
+
+  <header class="login-brand">
+    <span class="brand-mark" aria-hidden="true">
+      <svg width="34" height="34" viewBox="0 0 34 34"><rect x="5" y="3" width="24" height="28" rx="3" fill="none" stroke="#fff" stroke-width="3"/><path d="M10.5 17.5l4.2 4.2 8.8-9.4" fill="none" stroke="#fedb00" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </span>
+    <span class="brand-name" id="brandName">Mock Exam</span>
+  </header>
+
+  <main class="login-card" id="cardSignIn">
+    <button type="button" class="back-btn" id="backBtn"><span class="back-box"><span class="back-chev"></span></span><span>Back</span></button>
+    <h1 id="signInHeading">Sign In with a Student Account</h1>
+    <form id="loginForm" novalidate autocomplete="on">
+      <label for="username">Username</label>
+      <input id="username" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false">
+      <label for="password">Password</label>
+      <div class="pw-wrap">
+        <input id="password" name="password" type="password" autocomplete="current-password">
+        <button type="button" class="pw-eye" id="pwEye" aria-label="Show password"></button>
+      </div>
+      <button type="button" class="text-link small" id="forgotLink">Forgot password?</button>
+      <div class="login-error" id="loginError" role="alert"></div>
+      <button type="submit" class="submit-btn" id="submitBtn" disabled>Submit</button>
+    </form>
+    <button type="button" class="text-link help" id="helpLink">Need help signing in?</button>
+  </main>
+
+  <main class="login-card welcome" id="cardWelcome" hidden>
+    <h1>Welcome</h1>
+    <p>Sign in with the username and password your proctor gave you.</p>
+    <button type="button" class="submit-btn ready" id="toSignIn">Sign In</button>
+    <button type="button" class="text-link help" id="helpLink2">Need help signing in?</button>
+  </main>
+
+  <script src="/assets/js/config.js"></script>
+  <script src="/assets/js/common.js"></script>
+  <script src="/assets/js/login.js"></script>
+</body>
+</html>

@@ -1,0 +1,261 @@
+{
+  "id": "sample-exam",
+  "title": "Sample Exam",
+  "subtitle": "Placeholder content — replace with your own questions",
+  "settings": {
+    "allowEarlySubmit": false,
+    "earlyBreakEnd": false,
+    "loadDelayMs": [250, 650]
+  },
+  "sections": [
+    {
+      "title": "Section I",
+      "name": "Multiple Choice",
+      "minutes": 60,
+      "breakAfterMinutes": 10,
+      "directions": [
+        "Section I has 12 multiple-choice questions and lasts 1 hour.",
+        "This section contains passages followed by questions about their content, form, and style. Read each passage carefully and select the best answer to each question. Pay close attention to questions that use the words “NOT,” “LEAST,” or “EXCEPT.”",
+        "When a question refers to part of a passage, click the » symbol in the question to jump to that part of the passage.",
+        "You can move between questions in this section until time runs out. The timer turns red when 5 minutes are left, and your proctor won’t announce the time."
+      ],
+      "passages": {
+        "poem": {
+          "heading": "Questions 1 through 5. Read the following poem carefully before you choose your answers.",
+          "intro": "<i>This is placeholder introductory text. Replace it with a short note about the poem, such as who wrote it and when it was published. The poem below is an original sample written for this practice test.</i>",
+          "title": "The Keeper",
+          "lines": [
+            "Above the harbor, where the gray gulls wheel,",
+            "A single window holds the evening light;",
+            "The keeper climbs the stair with measured heel",
+            "And trims the wick against the coming night.",
+            "No ship has asked him why he keeps the flame,",
+            "No captain knows the keeper by his name.",
+            "",
+            "Yet every hull that rounds the hidden reef",
+            "Is steered by hands that never touch the wheel:",
+            "A beam, a breath, a pause, a sweeping, brief,",
+            "Unbroken signal saying what is real.",
+            "The sea forgets; the rocks remain the same;",
+            "And still he climbs, and still he guards the flame.",
+            "",
+            "Some nights the fog comes in like folded wool",
+            "And smothers every star along the shore;",
+            "He sounds the horn, he keeps the lantern full,",
+            "He counts the hours and waits beside the door.",
+            "And when the morning breaks in silver seams,",
+            "He sleeps at last, and sails in other dreams—",
+            "Of ports he never saw, of lands unknown,",
+            "Of all the ships that found their way alone."
+          ]
+        },
+        "library": {
+          "heading": "Questions 6 through 8. Read the following passage carefully before you choose your answers.",
+          "intro": "<i>Placeholder introduction. The following passage is an original sample written for this practice test.</i>",
+          "html": [
+            "The town library opened at nine, but Mira arrived at a quarter to, as she had every Saturday for three years. <span data-ref=\"r6\">She liked the minutes before the doors unlocked, when the street was still deciding what kind of day it would be.</span> Delivery vans idled at the curb. A man in a paint-flecked jacket argued gently with his dog.",
+            "Inside, Mr. Abara would be walking the aisles with his cart, returning books to their places with the care of someone setting a table for guests. <span data-ref=\"r7\">He never hurried, and he never seemed late; time, in that building, appeared to bend around him.</span>",
+            "When the lock finally turned, Mira stepped in and breathed the familiar mixture of dust, paper, and floor polish. <span data-ref=\"r8\">It was not that the library was quiet—children laughed in the corner, the copier clattered—but that every sound seemed to have somewhere it belonged.</span>"
+          ]
+        }
+      },
+      "questions": [
+        {
+          "passage": "poem",
+          "lines": [1, 6],
+          "prompt": "Which of the following best describes the keeper as he is presented in the first stanza (lines 1-6)?»",
+          "choices": [
+            "A dedicated worker whose service goes unrecognized",
+            "A reluctant guardian who resents his duties",
+            "A celebrated figure admired by passing sailors",
+            "A lonely man who longs to return to sea"
+          ],
+          "answer": "A"
+        },
+        {
+          "passage": "poem",
+          "lines": [7, 10],
+          "prompt": "Lines 7-10 (“Yet every . . . real”)» suggest that the lighthouse beam",
+          "choices": [
+            "frightens sailors away from the harbor",
+            "fails to reach the most distant vessels",
+            "guides ships without physically controlling them",
+            "competes with the stars for attention"
+          ],
+          "answer": "C"
+        },
+        {
+          "passage": "poem",
+          "lines": [11, 12],
+          "prompt": "The closing couplet of the second stanza (lines 11-12)» primarily emphasizes the keeper’s",
+          "choices": [
+            "fear of the changing sea",
+            "persistence despite indifference",
+            "pride in his reputation",
+            "desire for companionship"
+          ],
+          "answer": "B"
+        },
+        {
+          "passage": "poem",
+          "lines": [13, 13],
+          "prompt": "In line 13, the comparison of fog to “folded wool”» most directly conveys the fog’s",
+          "choices": [
+            "unpredictable movement",
+            "bright color",
+            "cold temperature",
+            "thick, muffling quality"
+          ],
+          "answer": "D"
+        },
+        {
+          "passage": "poem",
+          "lines": [17, 20],
+          "prompt": "In the final four lines (lines 17-20),» the poem shifts its focus from",
+          "choices": [
+            "hope to despair",
+            "the present to the distant past",
+            "the keeper’s duties to his imagined journeys",
+            "the sea to the land"
+          ],
+          "answer": "C"
+        },
+        {
+          "passage": "library",
+          "ref": "r6",
+          "prompt": "The sentence “She liked . . . would be”» characterizes the early-morning street as",
+          "choices": [
+            "hostile and threatening",
+            "unsettled and full of possibility",
+            "crowded and noisy",
+            "dull and predictable"
+          ],
+          "answer": "B"
+        },
+        {
+          "passage": "library",
+          "ref": "r7",
+          "prompt": "The description of Mr. Abara in the second paragraph» suggests that he is",
+          "choices": [
+            "anxious about his responsibilities",
+            "careless with the library’s collection",
+            "calm and unhurried in his work",
+            "eager for the library to close"
+          ],
+          "answer": "C"
+        },
+        {
+          "passage": "library",
+          "ref": "r8",
+          "prompt": "In the final sentence of the passage,» the narrator distinguishes between",
+          "choices": [
+            "silence and order",
+            "children and adults",
+            "work and leisure",
+            "the old library and a new one"
+          ],
+          "answer": "A"
+        },
+        {
+          "prompt": "This is a placeholder question with no passage, so it appears centered on the screen. Which choice describes it?",
+          "choices": [
+            "A question that uses a single centered column",
+            "A question that needs the passage on the left",
+            "A question that has no answer choices",
+            "A free-response question"
+          ],
+          "answer": "A"
+        },
+        {
+          "prompt": "Each student who enrolls at a school is assigned a unique ID stored as a binary number. IDs increase by 1 for each new student. If the most recent ID was <code>0110 1011</code>, what ID will the next student receive?",
+          "choices": [
+            "<code>0110 1010</code>",
+            "<code>0110 1100</code>",
+            "<code>0111 1011</code>",
+            "<code>1110 1011</code>"
+          ],
+          "answer": "B"
+        },
+        {
+          "prompt": "Which of the following words is closest in meaning to “steadfast”?",
+          "choices": ["Fickle", "Hasty", "Unwavering", "Fragile"],
+          "answer": "C"
+        },
+        {
+          "prompt": "If 3<i>x</i> + 7 = 22, what is the value of <i>x</i>?",
+          "choices": ["3", "5", "7", "15"],
+          "answer": "B"
+        }
+      ]
+    },
+    {
+      "title": "Section II",
+      "name": "Free Response",
+      "minutes": 90,
+      "directions": [
+        "Section II has 3 free-response questions and lasts 1 hour and 30 minutes.",
+        "Type each response in the box next to its question. Your work is saved automatically as you type. Spelling isn’t checked, and spelling mistakes won’t affect your score.",
+        "You may pace yourself as you like, or use these suggested times: about 40 minutes on question 1, 30 minutes on question 2, and 20 minutes on question 3.",
+        "You can move between questions in this section until time runs out. The timer turns red when 5 minutes are left, and your proctor won’t announce the time."
+      ],
+      "passages": {
+        "bridge": {
+          "html": [
+            "The following passage is an original placeholder written for this practice test. Read the passage carefully. Then, in a well-written essay, analyze how the author uses literary elements and techniques to convey the narrator’s complicated feelings about the town’s new bridge.",
+            "In your response, you should:<ul><li>State a clear, defensible thesis.</li><li>Choose specific evidence from the passage to support your reasoning.</li><li>Explain how that evidence supports your reasoning.</li><li>Write clearly, with appropriate grammar and punctuation.</li></ul>",
+            "<p class=\"title\"><b>The Crossing</b></p>",
+            "For forty years the ferry had carried us across the river, slow as an old argument. My grandfather ran it, then my uncle, and on summer evenings I sold lemonade to passengers who complained about the wait and then, invariably, stayed on the dock after they landed, watching the water as if it owed them something.",
+            "The bridge went up in eleven months. It was beautiful, I will admit that: a clean gray line drawn across the sky, so confident it seemed to have always been there. On opening day the mayor cut a ribbon and the high school band played something brave. People drove across, honking, and drove back, and honked again.",
+            "Nobody waits anymore. That is the whole point, and I understand it. But some evenings I walk down to the old dock, where the ferry sits with its paint peeling, and I find that I am still waiting—for what, I could not tell you."
+          ]
+        },
+        "docs": {
+          "documents": [
+            {
+              "label": "Document 1",
+              "title": "Source: Town council minutes (placeholder), 1902",
+              "html": "Placeholder document text. The council notes that ferry delays have caused farmers to lose crops before they reach market, and recommends studying the cost of a permanent crossing."
+            },
+            {
+              "label": "Document 2",
+              "title": "Source: Letter to the editor (placeholder), 1903",
+              "html": "Placeholder document text. A resident argues that the ferry is part of the town’s character and that a bridge would bring “strangers and noise” from the city."
+            },
+            {
+              "label": "Document 3",
+              "title": "Source: Engineering report (placeholder), 1904",
+              "html": "Placeholder document text. An engineer estimates that a steel bridge would cut the crossing time from forty minutes to three and would carry ten times as many wagons each day."
+            }
+          ]
+        }
+      },
+      "questions": [
+        {
+          "passage": "bridge",
+          "prompt": "In a well-written essay, analyze how the author uses literary elements and techniques to convey the narrator’s complicated feelings about the new bridge.",
+          "points": 6,
+          "rubric": "Placeholder rubric: thesis (1), evidence and commentary (4), sophistication (1)."
+        },
+        {
+          "passage": "docs",
+          "prompt": "Using at least two of the documents, explain why the town decided to build a bridge, and describe one argument against it. (Select a document number at the top of the left panel to read it.)",
+          "points": 7
+        },
+        {
+          "prompt": "Answer ONE of the following questions. You can switch your choice at any time, and your work on each one is saved.",
+          "choose": [
+            {
+              "label": "Question 3",
+              "prompt": "Placeholder prompt A: Describe a place in your community that has changed, and explain what was gained and what was lost."
+            },
+            {
+              "label": "Question 4",
+              "prompt": "Placeholder prompt B: Some people argue that efficiency always improves daily life. Take a position on this claim and support it with examples."
+            }
+          ],
+          "points": 6
+        }
+      ]
+    }
+  ]
+}

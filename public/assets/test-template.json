@@ -1,0 +1,56 @@
+{
+  "id": "my-test-1",
+  "title": "AP Biology",
+  "subtitle": "Practice Exam 1",
+  "settings": {
+    "allowEarlySubmit": false,
+    "earlyBreakEnd": false
+  },
+  "sections": [
+    {
+      "title": "Section I",
+      "minutes": 90,
+      "breakAfterMinutes": 10,
+      "directions": [
+        "Section I has 2 multiple-choice questions and lasts 1 hour and 30 minutes.",
+        "Select the best answer for each question. You can move between questions until time runs out."
+      ],
+      "passages": {
+        "p1": {
+          "heading": "Questions 1 and 2 refer to the following passage.",
+          "html": [
+            "Write the passage here. <span data-ref=\"r1\">Wrap the sentence a question points to in a span with a data-ref name.</span> That text gets underlined when the question is on screen.",
+            "Each item in this list becomes its own paragraph."
+          ]
+        }
+      },
+      "questions": [
+        {
+          "passage": "p1",
+          "ref": "r1",
+          "prompt": "The underlined sentence» mainly serves to",
+          "choices": ["first choice", "second choice", "third choice", "fourth choice"],
+          "answer": "B",
+          "explanation": "Optional. Only the proctor sees this."
+        },
+        {
+          "prompt": "A question with no passage is shown in a single centered column.",
+          "choices": ["first choice", "second choice", "third choice", "fourth choice"],
+          "answer": "A"
+        }
+      ]
+    },
+    {
+      "title": "Section II",
+      "minutes": 90,
+      "directions": "Section II has 1 free-response question and lasts 1 hour and 30 minutes.",
+      "questions": [
+        {
+          "prompt": "Write the free-response question here.",
+          "points": 4,
+          "rubric": "Optional scoring notes. Only the proctor sees this."
+        }
+      ]
+    }
+  ]
+}
