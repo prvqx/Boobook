@@ -1,0 +1,17 @@
+{
+  "name": "mock-exam",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Digital practice exam app with a live proctor dashboard (Vercel + Postgres).",
+  "scripts": {
+    "dev": "node dev/server.mjs"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.16"
+  }
+}
