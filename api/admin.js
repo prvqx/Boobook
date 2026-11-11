@@ -2,7 +2,8 @@
 import { handler, json, readBody, queryParams, HttpError } from '../lib/http.js';
 import { requireAdmin, hashPassword } from '../lib/auth.js';
 import { q, one, ms } from '../lib/db.js';
-import { normalizeTest, scoreAttempt } from '../lib/testdef.js';
+import { normalizeTest, scoreAttempt, isCorrect } from '../lib/testdef.js';
+import { listImages, putImage, deleteImage, imageExists, missingImages, IMAGE_TYPES, validImageName } from '../lib/images.js';
 import {
   getTestDef, forgetTest, listAttempts, loadAttempt, mutate, summarize, advance, logEvent,
 } from '../lib/attempts.js';
@@ -45,6 +46,13 @@ export default handler(async (request) => {
       return setStartCode(body);
     case 'deleteTest':
       return deleteTest(body);
+    // ---- images
+    case 'images':
+      return imagesList();
+    case 'uploadImage':
+      return uploadImage(body);
+    case 'deleteImage':
+      return removeImage(body);
     // ---- accounts
     case 'users':
       return listUsers();
@@ -125,6 +133,9 @@ async function attemptDetail(id) {
     view: at.view || {},
     test: def,
     score: scoreAttempt(def, at.answers || {}),
+    correct: Object.fromEntries(
+      def.sections.flatMap((s) => s.questions).filter((q) => q.answer).map((q) => [q.id, isCorrect(q, (at.answers || {})[q.id])])
+    ),
     events: events.map(publicEvent),
   });
 }
@@ -252,8 +263,10 @@ async function saveTest(body) {
       throw new HttpError(400, `That isn't valid JSON: ${e.message}`);
     }
   }
-  const { def, errors } = normalizeTest(raw);
+  const { def, errors, imageNames } = normalizeTest(raw);
   if (errors.length) return json({ ok: false, errors }, 422);
+  const missing = await missingImages(imageNames || []);
+  const warnings = missing.map((n) => `Image "${n}" hasn't been uploaded yet (Images tab). It will show as broken until you upload it.`);
   const existing = await one('select id from tests where id = $1', [def.id]);
   if (existing && !body.overwrite) {
     return json({ ok: false, exists: true, errors: [`A test with id "${def.id}" already exists. Replace it?`] }, 409);
@@ -264,7 +277,7 @@ async function saveTest(body) {
     [def.id, def.title, JSON.stringify(def)]
   );
   forgetTest(def.id);
-  return json({ ok: true, id: def.id, replaced: !!existing });
+  return json({ ok: true, id: def.id, replaced: !!existing, warnings });
 }
 
 async function setTestOpen(body) {
@@ -285,6 +298,35 @@ async function deleteTest(body) {
   const rows = await q('delete from tests where id = $1 returning id', [String(body.id)]);
   if (!rows.length) throw new HttpError(404, 'Test not found.');
   forgetTest(String(body.id));
+  return json({ ok: true });
+}
+
+// ---------------------------------------------------------------- images
+async function imagesList() {
+  const rows = await listImages();
+  return json({
+    images: rows.map((r) => ({ name: r.name, mime: r.mime, size: r.size, width: r.width, height: r.height, createdAt: ms(r.created_at) })),
+  });
+}
+
+async function uploadImage(body) {
+  const name = String(body.name || '').trim();
+  if (!validImageName(name)) throw new HttpError(400, 'Image names can use letters, numbers, dots, dashes and underscores (no spaces).');
+  const m = /^data:([a-z+/.-]+);base64,(.+)$/i.exec(String(body.data || ''));
+  if (!m) throw new HttpError(400, "That file couldn't be read as an image.");
+  const mime = m[1].toLowerCase();
+  if (!IMAGE_TYPES.has(mime)) throw new HttpError(400, 'Use a PNG, JPG, GIF, WebP or SVG image.');
+  const buf = Buffer.from(m[2], 'base64');
+  if (buf.length > 3_000_000) throw new HttpError(413, 'That image is over 3 MB. Try a smaller or compressed version.');
+  if (!body.overwrite && (await imageExists(name))) {
+    return json({ ok: false, exists: true, error: `An image named "${name}" already exists. Replace it?` }, 409);
+  }
+  await putImage(name, mime, buf, Number(body.width) || null, Number(body.height) || null);
+  return json({ ok: true, name });
+}
+
+async function removeImage(body) {
+  if (!(await deleteImage(String(body.name || '')))) throw new HttpError(404, 'Image not found.');
   return json({ ok: true });
 }
 

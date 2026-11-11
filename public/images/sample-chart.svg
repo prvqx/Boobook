@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="380" viewBox="0 0 640 380" font-family="Roboto, Arial, sans-serif">
+  <rect width="640" height="380" fill="#ffffff"/>
+  <text x="320" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#1e1e1e">River Crossings per Year (placeholder data)</text>
+  <g stroke="#d9d9d9" stroke-width="1">
+    <line x1="80" y1="70" x2="600" y2="70"/>
+    <line x1="80" y1="130" x2="600" y2="130"/>
+    <line x1="80" y1="190" x2="600" y2="190"/>
+    <line x1="80" y1="250" x2="600" y2="250"/>
+  </g>
+  <line x1="80" y1="310" x2="600" y2="310" stroke="#1e1e1e" stroke-width="1.5"/>
+  <line x1="80" y1="60" x2="80" y2="310" stroke="#1e1e1e" stroke-width="1.5"/>
+  <g font-size="14" fill="#333" text-anchor="end">
+    <text x="72" y="315">0</text>
+    <text x="72" y="255">20</text>
+    <text x="72" y="195">40</text>
+    <text x="72" y="135">60</text>
+    <text x="72" y="75">80</text>
+  </g>
+  <text x="24" y="190" font-size="14" fill="#333" text-anchor="middle" transform="rotate(-90 24 190)">Crossings (thousands)</text>
+  <g fill="#4a6fd6">
+    <rect x="115" y="190" width="70" height="120"/>
+    <rect x="235" y="145" width="70" height="165"/>
+    <rect x="355" y="100" width="70" height="210"/>
+    <rect x="475" y="160" width="70" height="150"/>
+  </g>
+  <g font-size="15" fill="#1e1e1e" text-anchor="middle">
+    <text x="150" y="334">1900</text>
+    <text x="270" y="334">1901</text>
+    <text x="390" y="334">1902</text>
+    <text x="510" y="334">1903</text>
+  </g>
+  <text x="340" y="364" font-size="14" fill="#333" text-anchor="middle">Year</text>
+</svg>

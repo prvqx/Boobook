@@ -44,6 +44,7 @@
     document.querySelectorAll('.tab-panel').forEach((p) => (p.hidden = p.id !== `panel-${tab}`));
     if (tab === 'tests') loadTests();
     if (tab === 'accounts') loadUsers();
+    if (tab === 'images') loadImages();
     if (tab === 'live') renderLive();
   }
 
@@ -389,10 +390,12 @@
       h += `<div class="ans-grid">${sec.questions
         .map((q, qi) => {
           const a = d.answers[q.id] || {};
+          const val = q.type === 'input' ? (a.v || '').trim() : a.c;
           let cls = '';
-          if (a.c) cls = q.answer ? (a.c === q.answer ? 'right' : 'wrong') : 'answered';
+          if (val) cls = q.answer ? (d.correct[q.id] ? 'right' : 'wrong') : 'answered';
           if (qi === curQ) cls += ' cur';
-          return `<button type="button" class="ans ${cls}" data-q="${qi}" title="Question ${q.number}"><span class="n">${q.number}</span><span class="l">${a.c || '–'}</span>${a.r ? `<span class="fl">${icon.flagSmall}</span>` : ''}</button>`;
+          const shown = q.type === 'input' ? (val ? esc(val.length > 5 ? val.slice(0, 4) + '…' : val) : '–') : val || '–';
+          return `<button type="button" class="ans ${cls}" data-q="${qi}" title="Question ${q.number}${q.type === 'input' ? ' (short answer)' : ''}"><span class="n">${q.number}</span><span class="l">${shown}</span>${a.r ? `<span class="fl">${icon.flagSmall}</span>` : ''}</button>`;
         })
         .join('')}</div>` +
         '<div class="ans-legend"><span><i class="lr"></i>Correct</span><span><i class="lw"></i>Incorrect</span><span><i></i>Answered (no key)</span><span><i class="lu"></i>Blank</span><span><i class="lc"></i>Looking at it now</span></div>';
@@ -436,6 +439,16 @@
   }
 
   function questionDetail(sec, q, a) {
+    if (q.type === 'input') {
+      const v = (a.v || '').trim();
+      const ok = q.answer ? A.detail.correct[q.id] : null;
+      return (
+        `<div class="q-detail"><div class="qd-prompt"><b style="font-family:var(--ui)">Question ${q.number}.</b> ${q.prompt}</div>` +
+        `<p style="margin:0">Their answer: <b>${v ? esc(v) : '—'}</b>${ok === true ? ' <span class="pill green">correct</span>' : ok === false && v ? ' <span class="pill red">incorrect</span>' : ''}</p>` +
+        (q.answer ? `<p class="muted" style="margin:6px 0 0">Accepted: ${q.answer.map(esc).join(', ')}</p>` : '') +
+        `${q.explanation ? `<p class="small muted" style="margin:10px 0 0">${q.explanation}</p>` : ''}</div>`
+      );
+    }
     return (
       `<div class="q-detail"><div class="qd-prompt"><b style="font-family:var(--ui)">Question ${q.number}.</b> ${q.prompt}</div><ol>` +
       q.choices
@@ -443,7 +456,8 @@
           const L = LETTERS[i];
           const cls = [q.answer === L ? 'key' : '', a.c === L ? 'pick' : '', (a.x || []).includes(L) ? 'x' : ''].join(' ');
           const tags = [a.c === L ? 'their answer' : '', q.answer === L ? 'correct' : '', (a.x || []).includes(L) ? 'crossed out' : ''].filter(Boolean).join(' · ');
-          return `<li class="${cls}"><span class="ltr">${L}</span><span>${c}</span><span class="tags">${tags}</span></li>`;
+          const content = typeof c === 'string' ? c : `${c.text || ''}${(c.images || []).map((im) => `<img src="${esc(im.src)}" alt="" style="max-height:70px;display:block">`).join('')}`;
+          return `<li class="${cls}"><span class="ltr">${L}</span><span>${content}</span><span class="tags">${tags}</span></li>`;
         })
         .join('') +
       `</ol>${q.explanation ? `<p class="small muted" style="margin:10px 0 0">${q.explanation}</p>` : ''}</div>`
@@ -570,7 +584,8 @@
     $('uploadBtn').disabled = true;
     try {
       const d = await API.post('/api/admin', { action: 'saveTest', definition: pendingJson, overwrite });
-      errs.innerHTML = `<li>✓ “${esc(d.id)}” ${d.replaced ? 'was replaced' : 'was added'}. ${d.replaced ? '' : 'Turn on “Open to test takers” when you’re ready.'}</li>`;
+      errs.innerHTML = `<li>✓ “${esc(d.id)}” ${d.replaced ? 'was replaced' : 'was added'}. ${d.replaced ? '' : 'Turn on “Open to test takers” when you’re ready.'}</li>` +
+        (d.warnings || []).map((w) => `<li class="warn">⚠ ${esc(w)}</li>`).join('');
       errs.classList.add('ok');
       errs.hidden = false;
       pendingJson = null;
@@ -692,6 +707,135 @@
       try {
         await API.post('/api/admin', { action: 'deleteTest', id });
         loadTests();
+      } catch (err) {
+        toast(err.message);
+      }
+    }
+  });
+
+  // ================================================================ images tab
+  const imgUrl = (n) => `/api/exam?action=image&name=${encodeURIComponent(n)}`;
+  const kb = (b) => (b > 1024 * 1024 ? `${(b / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(b / 1024))} KB`);
+
+  async function loadImages() {
+    try {
+      const d = await API.get('/api/admin?action=images');
+      A.images = d.images;
+    } catch (e) {
+      $('imgGrid').innerHTML = `<div class="card">${esc(e.message)}</div>`;
+      return;
+    }
+    $('imgGrid').innerHTML = A.images.length
+      ? A.images
+          .map(
+            (im) =>
+              `<div class="img-card" data-name="${esc(im.name)}"><div class="thumb"><img src="${imgUrl(im.name)}&v=${im.createdAt}" alt="" loading="lazy"></div>` +
+              `<div class="meta"><b>${esc(im.name)}</b>${im.width ? `${im.width}×${im.height} · ` : ''}${kb(im.size)}</div>` +
+              '<div class="acts"><button type="button" class="ad-btn" data-act="copy">Copy name</button><button type="button" class="ad-btn" data-act="snippet">Copy JSON</button><button type="button" class="ad-btn danger" data-act="del">Delete</button></div></div>'
+          )
+          .join('')
+      : '<div class="card muted">No images yet.</div>';
+  }
+
+  const cleanName = (n) =>
+    n.toLowerCase().replace(/\.[a-z0-9]+$/, (ext) => ext).replace(/[^a-z0-9._-]+/g, '-').replace(/^[-.]+/, '').slice(0, 80) || `image-${Date.now()}`;
+
+  function readAsDataURL(file) {
+    return new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result);
+      r.onerror = rej;
+      r.readAsDataURL(file);
+    });
+  }
+
+  async function prepareImage(file) {
+    const original = await readAsDataURL(file);
+    if (file.type === 'image/svg+xml' || file.type === 'image/gif') return { data: original, name: cleanName(file.name) };
+    const img = await new Promise((res, rej) => {
+      const i = new Image();
+      i.onload = () => res(i);
+      i.onerror = () => rej(new Error(`${file.name} isn't a readable image.`));
+      i.src = original;
+    });
+    const MAX = 2000;
+    let { width, height } = img;
+    if (width <= MAX && file.size < 1_200_000) return { data: original, width, height, name: cleanName(file.name) };
+    const scale = Math.min(1, MAX / width);
+    width = Math.round(width * scale);
+    height = Math.round(height * scale);
+    const c = document.createElement('canvas');
+    c.width = width;
+    c.height = height;
+    const ctx = c.getContext('2d');
+    if (file.type !== 'image/png') {
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, width, height);
+    }
+    ctx.drawImage(img, 0, 0, width, height);
+    let data = file.type === 'image/png' ? c.toDataURL('image/png') : c.toDataURL('image/jpeg', 0.88);
+    let name = cleanName(file.name);
+    if (data.length > 3_900_000) {
+      data = c.toDataURL('image/jpeg', 0.82);
+      name = name.replace(/\.png$/, '.jpg');
+    }
+    return { data, width, height, name };
+  }
+
+  $('imgInput').addEventListener('change', async (e) => {
+    const files = [...e.target.files];
+    e.target.value = '';
+    let done = 0;
+    for (const f of files) {
+      $('imgStatus').textContent = `Uploading ${f.name}…`;
+      try {
+        const prep = await prepareImage(f);
+        const body = { action: 'uploadImage', name: prep.name, data: prep.data, width: prep.width, height: prep.height };
+        try {
+          await API.post('/api/admin', body);
+        } catch (err) {
+          if (err.status !== 409) throw err;
+          const r = await modal({
+            title: 'Replace this image?',
+            body: `<p>${esc(err.message)}</p><p>Tests that use this name will show the new picture.</p>`,
+            actions: [{ id: 'cancel', label: 'Keep the old one', kind: 'plain' }, { id: 'ok', label: 'Replace it', kind: 'yellow' }],
+          });
+          if (r !== 'ok') continue;
+          await API.post('/api/admin', { ...body, overwrite: true });
+        }
+        done++;
+      } catch (err) {
+        toast(`${f.name}: ${err.message}`, 6000);
+      }
+    }
+    $('imgStatus').textContent = done ? `Uploaded ${done} image${done === 1 ? '' : 's'}.` : '';
+    loadImages();
+  });
+
+  $('imgGrid').addEventListener('click', async (e) => {
+    const b = e.target.closest('button[data-act]');
+    if (!b) return;
+    const name = b.closest('.img-card').dataset.name;
+    const copy = async (text, msg) => {
+      try {
+        await navigator.clipboard.writeText(text);
+        toast(msg);
+      } catch {
+        toast(text, 8000);
+      }
+    };
+    if (b.dataset.act === 'copy') copy(name, `Copied “${name}”.`);
+    if (b.dataset.act === 'snippet') copy(`"image": "${name}"`, 'Copied — paste it into a passage, document, question or choice.');
+    if (b.dataset.act === 'del') {
+      const r = await modal({
+        title: `Delete ${name}?`,
+        body: '<p>Any test that uses this image will show a broken picture until you upload one with the same name.</p>',
+        actions: [{ id: 'cancel', label: 'Cancel', kind: 'plain' }, { id: 'ok', label: 'Delete image', kind: 'yellow' }],
+      });
+      if (r !== 'ok') return;
+      try {
+        await API.post('/api/admin', { action: 'deleteImage', name });
+        loadImages();
       } catch (err) {
         toast(err.message);
       }

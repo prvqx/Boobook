@@ -14,6 +14,7 @@
     <nav class="ad-tabs" role="tablist">
       <button type="button" role="tab" data-tab="live" aria-selected="true">Live <span class="tab-badge" id="alertBadge" hidden></span></button>
       <button type="button" role="tab" data-tab="tests" aria-selected="false">Tests</button>
+      <button type="button" role="tab" data-tab="images" aria-selected="false">Images</button>
       <button type="button" role="tab" data-tab="accounts" aria-selected="false">Accounts</button>
     </nav>
     <div class="ad-right">
@@ -65,6 +66,19 @@
         <ul class="errors" id="uploadErrors" hidden></ul>
       </div>
       <div id="testList" class="test-list"></div>
+    </section>
+
+    <!-- IMAGES -->
+    <section class="tab-panel" id="panel-images" hidden>
+      <div class="card">
+        <h2>Image library</h2>
+        <p class="muted">Upload pictures here, then use their names in a test file. For example, <code>"image": "unit3-graph.png"</code> on a passage, document, question or answer choice, or <code>&lt;img src="img:unit3-graph.png"&gt;</code> inside text. Large photos are shrunk automatically. Only signed-in people can see these images.</p>
+        <div class="upload-row">
+          <label class="file-btn"><input type="file" id="imgInput" accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml" multiple><span>Upload images…</span></label>
+          <span class="muted" id="imgStatus"></span>
+        </div>
+      </div>
+      <div class="img-grid" id="imgGrid"></div>
     </section>
 
     <!-- ACCOUNTS -->

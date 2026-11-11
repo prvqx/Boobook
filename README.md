@@ -161,8 +161,13 @@ Sign in as the proctor in one browser and as `avery` in a private window to see 
 
 ## Customizing
 - **App name and sign-in text:** edit `public/assets/js/config.js`, then commit the change on GitHub. Vercel redeploys automatically.
-- **Writing tests:** see `tests/FORMAT.md`. Upload new versions from the dashboard; no redeploy needed.
-- **Images in tests:** put files in `public/images/` and refer to them as `/images/name.png`, or use any public image URL.
+- **Writing tests:** see `tests/FORMAT.md`. Upload new versions from the dashboard; no redeploy needed. Tests can also have:
+  - short-answer (typed) questions
+  - pictures in passages, documents, prompts and answer choices
+  - a results page for test takers after they finish
+  - a custom time-warning point
+  - forward-only navigation
+- **Images in tests:** upload them in the dashboard's **Images** tab, then use their names in a test file, for example `"image": "graph1.png"`. You can also put files in `public/images/` (`"/images/name.png"`) or use any public image URL.
 
 ## Good to know
 - Highlights and notes are saved in each test taker's browser. They survive refreshes on the same device but don't show up on the dashboard. Answers, flags and cross-outs are saved to the server.

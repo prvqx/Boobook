@@ -77,6 +77,17 @@ create table if not exists events (
 );
 create index if not exists events_attempt_idx on events(attempt_id);
 
+-- Pictures uploaded in the dashboard's Images tab (also created automatically on first use).
+create table if not exists images (
+  name        text primary key,
+  mime        text not null,
+  data        bytea not null,
+  size        integer not null,
+  width       integer,
+  height      integer,
+  created_at  timestamptz not null default now()
+);
+
 -- ---------------------------------------------------------------------
 --  Proctor (admin) account.
 --  Username: proctor     Password: Proctor-2026!

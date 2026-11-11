@@ -5,7 +5,12 @@
   "settings": {
     "allowEarlySubmit": false,
     "earlyBreakEnd": false,
-    "loadDelayMs": [250, 650]
+    "loadDelayMs": [
+      250,
+      650
+    ],
+    "showResults": "full",
+    "warningMinutes": 5
   },
   "sections": [
     {
@@ -14,7 +19,7 @@
       "minutes": 60,
       "breakAfterMinutes": 10,
       "directions": [
-        "Section I has 12 multiple-choice questions and lasts 1 hour.",
+        "Section I has 14 questions and lasts 1 hour. Most are multiple-choice; question 13 asks you to type a short answer.",
         "This section contains passages followed by questions about their content, form, and style. Read each passage carefully and select the best answer to each question. Pay close attention to questions that use the words “NOT,” “LEAST,” or “EXCEPT.”",
         "When a question refers to part of a passage, click the » symbol in the question to jump to that part of the passage.",
         "You can move between questions in this section until time runs out. The timer turns red when 5 minutes are left, and your proctor won’t announce the time."
@@ -62,7 +67,10 @@
       "questions": [
         {
           "passage": "poem",
-          "lines": [1, 6],
+          "lines": [
+            1,
+            6
+          ],
           "prompt": "Which of the following best describes the keeper as he is presented in the first stanza (lines 1-6)?»",
           "choices": [
             "A dedicated worker whose service goes unrecognized",
@@ -74,7 +82,10 @@
         },
         {
           "passage": "poem",
-          "lines": [7, 10],
+          "lines": [
+            7,
+            10
+          ],
           "prompt": "Lines 7-10 (“Yet every . . . real”)» suggest that the lighthouse beam",
           "choices": [
             "frightens sailors away from the harbor",
@@ -86,7 +97,10 @@
         },
         {
           "passage": "poem",
-          "lines": [11, 12],
+          "lines": [
+            11,
+            12
+          ],
           "prompt": "The closing couplet of the second stanza (lines 11-12)» primarily emphasizes the keeper’s",
           "choices": [
             "fear of the changing sea",
@@ -98,7 +112,10 @@
         },
         {
           "passage": "poem",
-          "lines": [13, 13],
+          "lines": [
+            13,
+            13
+          ],
           "prompt": "In line 13, the comparison of fog to “folded wool”» most directly conveys the fog’s",
           "choices": [
             "unpredictable movement",
@@ -110,7 +127,10 @@
         },
         {
           "passage": "poem",
-          "lines": [17, 20],
+          "lines": [
+            17,
+            20
+          ],
           "prompt": "In the final four lines (lines 17-20),» the poem shifts its focus from",
           "choices": [
             "hope to despair",
@@ -178,13 +198,44 @@
         },
         {
           "prompt": "Which of the following words is closest in meaning to “steadfast”?",
-          "choices": ["Fickle", "Hasty", "Unwavering", "Fragile"],
+          "choices": [
+            "Fickle",
+            "Hasty",
+            "Unwavering",
+            "Fragile"
+          ],
           "answer": "C"
         },
         {
           "prompt": "If 3<i>x</i> + 7 = 22, what is the value of <i>x</i>?",
-          "choices": ["3", "5", "7", "15"],
+          "choices": [
+            "3",
+            "5",
+            "7",
+            "15"
+          ],
           "answer": "B"
+        },
+        {
+          "type": "input",
+          "prompt": "A ferry makes 9 one-way crossings every day. How many crossings does it make in one week (7 days)? Type your answer in the box.",
+          "answer": "63",
+          "explanation": "9 crossings × 7 days = 63."
+        },
+        {
+          "prompt": "The chart below shows placeholder data. In which year were the most river crossings made?",
+          "image": {
+            "src": "/images/sample-chart.svg",
+            "alt": "Bar chart of river crossings for 1900 to 1903"
+          },
+          "choices": [
+            "1900",
+            "1901",
+            "1902",
+            "1903"
+          ],
+          "answer": "C",
+          "explanation": "The 1902 bar is the tallest (about 70 thousand crossings)."
         }
       ]
     },
@@ -225,6 +276,11 @@
               "label": "Document 3",
               "title": "Source: Engineering report (placeholder), 1904",
               "html": "Placeholder document text. An engineer estimates that a steel bridge would cut the crossing time from forty minutes to three and would carry ten times as many wagons each day."
+            },
+            {
+              "label": "Document 4",
+              "title": "Source: Ferry and bridge crossings by year (placeholder chart)",
+              "image": "/images/sample-chart.svg"
             }
           ]
         }
@@ -238,7 +294,7 @@
         },
         {
           "passage": "docs",
-          "prompt": "Using at least two of the documents, explain why the town decided to build a bridge, and describe one argument against it. (Select a document number at the top of the left panel to read it.)",
+          "prompt": "Using at least two of the documents, explain why the town decided to build a bridge, and describe one argument against it. (Select a document number at the top of the left panel to read it. Document 4 is a chart; click it to enlarge.)",
           "points": 7
         },
         {

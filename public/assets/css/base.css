@@ -3,8 +3,8 @@
 :root {
   --indigo: #324dc7;          /* sign-in background, cross-out tool */
   --cb-blue: #0077c8;         /* answered question tiles */
-  --btn-blue: #3373c4;        /* Back / Next */
-  --btn-blue-dark: #1f4290;
+  --btn-blue: #324dc7;        /* Back / Next */
+  --btn-blue-dark: #2845c4;
   --blue-text: #2b62a8;       /* question numbers, links */
   --sel-blue: #2a5fac;        /* selected answer */
   --yellow: #fedb00;
@@ -55,7 +55,7 @@ svg { display: block; }
   background: var(--btn-blue); color: #fff; border: 1px solid var(--btn-blue-dark);
   height: 42px; padding: 0 22px; font-size: 16px; font-weight: 500;
 }
-.btn-blue:hover:not(:disabled) { background: #2b66b3; }
+.btn-blue:hover:not(:disabled) { background: #2a41ad; }
 .btn-blue:disabled { opacity: .55; }
 .btn-outline {
   background: #fff; color: var(--blue-text); border: 1.5px solid var(--blue-text);
@@ -63,6 +63,7 @@ svg { display: block; }
 }
 .btn-outline:hover { background: #f1f5fb; }
 .btn-plain { height: 40px; padding: 0 20px; font-weight: 500; border: 1px solid #1e1e1e; background: #fff; }
+a.btn-yellow, a.btn-blue, a.btn-outline, a.btn-plain { text-decoration: none; }
 .btn-plain:hover { background: #f4f4f4; }
 
 /* ---------- Modal ---------- */

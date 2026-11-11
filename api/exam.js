@@ -3,7 +3,8 @@
 import { handler, json, readBody, queryParams, HttpError } from '../lib/http.js';
 import { requireUser, publicUser } from '../lib/auth.js';
 import { q, one, ms } from '../lib/db.js';
-import { publicTest, cleanAnswer } from '../lib/testdef.js';
+import { publicTest, cleanAnswer, buildResults } from '../lib/testdef.js';
+import { getImage } from '../lib/images.js';
 import {
   getTestDef, loadAttempt, mutate, publicAttempt, logEvent, writableSection,
 } from '../lib/attempts.js';
@@ -19,6 +20,8 @@ export default handler(async (request) => {
   const action = body.action || params.get('action');
 
   switch (action) {
+    case 'image':
+      return serveImage(params.get('name'));
     case 'home':
       return home(user);
     case 'start':
@@ -75,6 +78,7 @@ async function home(user) {
       description: r.definition.description || null,
       sections: sectionSummary(r.definition),
       open: r.is_open,
+      showResults: (r.definition.settings && r.definition.settings.showResults) || 'none',
       needsCode: r.needs_code && !isAdmin,
       attempt: r.attempt_id ? { id: r.attempt_id, status: r.status, phase: r.phase, sectionIndex: r.section_index } : null,
     })),
@@ -121,6 +125,7 @@ async function load(user, attemptId) {
     }
     await logEvent(at.id, user.id, 'opened', at.section_index, qn);
   }
+  const mode = (def.settings && def.settings.showResults) || 'none';
   return json({
     now,
     user: publicUser(user),
@@ -128,6 +133,21 @@ async function load(user, attemptId) {
     attempt: publicAttempt(at),
     answers: at.answers || {},
     view: at.view || {},
+    results: at.status === 'completed' && mode !== 'none' ? buildResults(def, at.answers || {}, mode) : null,
+  });
+}
+
+async function serveImage(name) {
+  const img = await getImage(String(name || ''));
+  if (!img) return new Response('Image not found', { status: 404, headers: { 'content-type': 'text/plain' } });
+  return new Response(img.data, {
+    status: 200,
+    headers: {
+      'content-type': img.mime,
+      'cache-control': 'private, max-age=3600',
+      'x-content-type-options': 'nosniff',
+      'content-security-policy': "default-src 'none'; style-src 'unsafe-inline'; sandbox",
+    },
   });
 }
 

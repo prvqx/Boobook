@@ -38,6 +38,9 @@
     expiring: false,
     lastCopyLog: 0,
     unloading: false,
+    settings: {},
+    results: null,
+    showResults: false,
   };
 
   const now = () => Date.now() + S.clockOffset;
@@ -48,6 +51,7 @@
   function isAnswered(q, a) {
     if (!a) return false;
     if (q.type === 'mcq') return !!a.c;
+    if (q.type === 'input') return String(a.v || '').trim().length > 0;
     if (q.choose) return Number.isInteger(a.o) && stripTags(a.ts && a.ts[a.o]).length > 0;
     return stripTags(a.t).length > 0;
   }
@@ -71,6 +75,14 @@
     S.test = data.test;
     S.answers = data.answers || {};
     S.attempt = data.attempt;
+    S.results = data.results || null;
+    S.settings = Object.assign(
+      { warningMinutes: 5, ruleColors: true, crossOut: true, showResults: 'none', allowBack: true },
+      S.test.settings || {}
+    );
+    S.elim = S.settings.crossOut !== false;
+    S.showResults = new URLSearchParams(location.search).get('view') === 'results' && !!S.results;
+    applyRules();
     document.title = `${S.test.title} · ${U.appName}`;
     const v = data.view || {};
     if (v.section === S.attempt.sectionIndex && Number.isInteger(v.q)) S.qIndex = Math.max(0, Math.min(v.q, sec().questions.length - 1));
@@ -84,6 +96,24 @@
     setInterval(() => sync(), 4000);
     installFocusTracking();
     installGuards();
+  }
+
+  // The colored dashed rules: Bluebook's fixed 28-dash color cycle (looks random, repeats).
+  function applyRules() {
+    const cycle = 'YBDDDDDDLDDLDYBDLDLYLDDDDDDL';
+    const colored = S.settings.ruleColors !== false;
+    const make = (start, dash, gap, dark) => {
+      const col = colored ? { D: dark, L: '#b7b7b7', Y: '#fedb00', B: '#0093db' } : { D: '#b1b1b1', L: '#b1b1b1', Y: '#b1b1b1', B: '#b1b1b1' };
+      const seq = cycle.slice(start) + cycle.slice(0, start);
+      const pitch = dash + gap;
+      const w = +(seq.length * pitch).toFixed(2);
+      const rects = [...seq].map((c, i) => `<rect x='${(i * pitch).toFixed(2)}' y='0' width='${dash}' height='2' fill='${col[c]}'/>`).join('');
+      const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='2' viewBox='0 0 ${w} 2' preserveAspectRatio='none'>${rects}</svg>`;
+      return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+    };
+    const root = document.documentElement.style;
+    root.setProperty('--rule-main', make(27, 18, 1, '#404040'));
+    root.setProperty('--rule-q', make(26, 13.7, 1, '#333333'));
   }
 
   function prefsKey() {
@@ -196,6 +226,19 @@
         S.fiveMinShown = false;
       }
       render();
+      if (next.status === 'completed' && S.settings.showResults !== 'none' && !S.results) fetchResults();
+    }
+  }
+
+  async function fetchResults() {
+    try {
+      const d = await API.get(`/api/exam?action=load&attempt=${attemptId}`);
+      if (d.results) {
+        S.results = d.results;
+        if (S.attempt.status === 'completed' && !S.showResults) render();
+      }
+    } catch {
+      /* results are optional */
     }
   }
 
@@ -236,15 +279,38 @@
     const txt = fmtClock(left);
     if (ub) ub.textContent = txt;
     if (!t) return;
-    if (left <= 300 && !S.fiveMinShown) {
+    const warn = (Number(S.settings.warningMinutes) || 0) * 60;
+    const under = warn > 0 && left <= warn;
+    if (under && !S.fiveMinShown) {
       S.fiveMinShown = true;
-      if (S.timerHidden) {
-        S.timerHidden = false;
-        syncTimerVisibility();
-      }
+      // Pop the alert only when the moment is crossed while testing (not on a reload afterwards).
+      if (left > warn - 15) showTimeWarning();
     }
-    t.classList.toggle('red', left <= 300);
+    const head = app.querySelector('.tu-head');
+    if (head && head.classList.contains('under-warn') !== under) {
+      head.classList.toggle('under-warn', under);
+      if (under) S.timerHidden = false;
+      syncTimerVisibility();
+    }
+    t.classList.toggle('red', left <= (warn || 300));
     if (t.textContent !== txt) t.textContent = txt;
+  }
+
+  function showTimeWarning() {
+    closeTimeWarning();
+    const m = Math.round((Number(S.settings.warningMinutes) || 5) * 10) / 10;
+    const unit = m === 1 ? 'Minute' : 'Minutes';
+    const pop = U.el(
+      '<div class="time-warn" role="alertdialog" aria-live="assertive" aria-label="Time warning">' +
+        `<div class="tw-ic">${icon.stopwatch}</div>` +
+        `<div class="tw-text"><b>${m} ${unit} Remaining</b><span>You have ${m} ${unit.toLowerCase()} left in this section. The timer can no longer be hidden.</span></div>` +
+        `<button type="button" class="tw-close" data-act="close-warn" aria-label="Close">${icon.close}</button>` +
+        '</div>'
+    );
+    app.appendChild(pop);
+  }
+  function closeTimeWarning() {
+    app.querySelectorAll('.time-warn').forEach((n) => n.remove());
   }
 
   function syncTimerVisibility() {
@@ -274,7 +340,7 @@
     }
     const a = S.attempt;
     if (a.status === 'paused') return renderPaused();
-    if (a.status === 'completed' || a.phase === 'done') return renderFinish();
+    if (a.status === 'completed' || a.phase === 'done') return S.showResults && S.results ? renderResults() : renderFinish();
     if (a.phase === 'directions') return renderDirectionsPage();
     if (a.phase === 'break') return renderBreak();
     if (S.ubreak) return renderUnscheduledBreak();
@@ -326,7 +392,7 @@
     } else {
       fc.style.visibility = '';
       label.textContent = `Question ${S.qIndex + 1} of ${s.questions.length}`;
-      back.hidden = S.qIndex === 0;
+      back.hidden = S.qIndex === 0 || S.settings.allowBack === false;
       next.hidden = false;
       next.textContent = 'Next';
     }
@@ -376,8 +442,11 @@
     }
     const q = s.questions[S.qIndex];
     const pid = passageIdFor(s, q);
-    const p = pid ? s.passages[pid] : null;
-    body.innerHTML = p ? splitHTML(s, q, p) : centeredHTML(s, q);
+    const pFull = pid ? s.passages[pid] : null;
+    const p = pFull && q.layout !== 'centered' ? pFull : null;
+    body.innerHTML = p ? splitHTML(s, q, p) : centeredHTML(s, q, pFull);
+    const cp = body.querySelector('.center-passage');
+    if (cp) Annot.mount(cp, `p:${s.index}:${pFull.id}`, { after: (c) => applyRefs(c, q) });
 
     if (p) {
       const pc = body.querySelector('.passage');
@@ -421,8 +490,9 @@
     );
   }
 
-  function centeredHTML(s, q) {
-    return `<div class="center-scroll"><div class="center-col${q.type === 'frq' ? ' frq' : ''}">${questionHTML(s, q)}</div></div>`;
+  function centeredHTML(s, q, p) {
+    const above = p ? `<div class="passage center-passage">${passageHTML(p, p.documents ? docIndex(s, p) : null)}</div>` : '';
+    return `<div class="center-scroll"><div class="center-col${q.type === 'frq' ? ' frq' : ''}">${above}${questionHTML(s, q)}</div></div>`;
   }
 
   function passageHTML(p, di) {
@@ -433,11 +503,14 @@
       const d = p.documents[di];
       h += `<div class="doc-head">${esc(d.label)}</div>`;
       if (d.title) h += `<p><i>${d.title}</i></p>`;
-      if (d.image) h += `<figure class="p-fig"><img src="${esc(d.image)}" alt=""></figure>`;
+      h += figures(d.images || (d.image ? [{ src: d.image }] : null));
       if (d.html) h += `<div class="p-html">${d.html}</div>`;
       if (d.source) h += `<div class="p-source">${d.source}</div>`;
     }
-    if (p.image) h += `<figure class="p-fig"><img src="${esc(p.image)}" alt="${esc(p.imageAlt || '')}">${p.caption ? `<figcaption>${p.caption}</figcaption>` : ''}</figure>`;
+    const legacy = p.image ? [{ src: p.image, alt: p.imageAlt, caption: p.caption }] : null;
+    const pImgs = p.images || legacy;
+    const imgsFirst = p.imagesFirst || !!legacy;
+    if (imgsFirst) h += figures(pImgs);
     if (p.title) h += `<h3 class="p-title">${p.title}</h3>`;
     if (p.lines) {
       let n = 0;
@@ -454,8 +527,37 @@
       h += '</div>';
     }
     if (p.html) h += `<div class="p-html">${p.html}</div>`;
+    if (!imgsFirst) h += figures(pImgs);
     if (p.source) h += `<div class="p-source">${p.source}</div>`;
     return h;
+  }
+
+  function figures(list) {
+    if (!list || !list.length) return '';
+    return list
+      .map((im) => {
+        const w = im.width ? (/^\d+$/.test(String(im.width)) ? `${im.width}px` : String(im.width)) : '';
+        return (
+          '<figure class="p-fig">' +
+          `<button type="button" class="zoomable" data-act="zoom" data-src="${esc(im.src)}" aria-label="Enlarge image">` +
+          `<img src="${esc(im.src)}" alt="${esc(im.alt || '')}"${w ? ` style="width:${esc(w)}"` : ''}></button>` +
+          (im.caption ? `<figcaption>${im.caption}</figcaption>` : '') +
+          '</figure>'
+        );
+      })
+      .join('');
+  }
+
+  function openLightbox(src) {
+    const box = U.el(
+      `<div class="lightbox" role="dialog" aria-label="Enlarged image"><img src="${esc(src)}" alt=""><button type="button" class="lb-close" aria-label="Close">${icon.close}</button><div class="lb-hint">Click the image to zoom · Esc to close</div></div>`
+    );
+    const img = box.querySelector('img');
+    box.addEventListener('click', (e) => {
+      if (e.target === img) img.classList.toggle('full');
+      else box.remove();
+    });
+    document.body.appendChild(box);
   }
 
   function applyRefs(container, q) {
@@ -493,11 +595,22 @@
         ? `<button type="button" class="q-elim" data-act="elim" aria-pressed="${S.elim}" aria-label="Cross out answer choices" title="Cross out answer choices">${icon.abc}</button>`
         : '') +
       '</div>';
+    const imgs = figures(q.images);
+    const stem = `<div class="q-stem">${q.imagesFirst ? imgs : ''}${stemHTML(q)}${q.imagesFirst ? '' : imgs}</div>`;
     if (q.type === 'mcq') {
-      h += `<div class="qcol${S.elim ? ' elim-on' : ''}"><div class="q-stem">${stemHTML(q)}</div><div class="choices" role="radiogroup" aria-label="Answer choices">${choicesHTML(q)}</div></div>`;
+      h += `<div class="qcol${S.elim ? ' elim-on' : ''}">${stem}<div class="choices" role="radiogroup" aria-label="Answer choices">${choicesHTML(q)}</div></div>`;
       return h;
     }
-    h += `<div class="q-stem">${stemHTML(q)}</div>`;
+    if (q.type === 'input') {
+      const v = a.v || '';
+      h +=
+        `<div class="qcol">${stem}<div class="spr">` +
+        (q.inputLabel ? `<label class="spr-label" for="spr-${esc(q.id)}">${q.inputLabel}</label>` : '') +
+        `<input id="spr-${esc(q.id)}" class="spr-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="${q.maxLength || 12}" value="${esc(v)}" aria-label="Your answer">` +
+        `<div class="spr-preview">Answer Preview: <b class="spr-val">${esc(v)}</b></div></div></div>`;
+      return h;
+    }
+    h += stem;
     let showEditor = true;
     if (q.choose) {
       const o = Number.isInteger(a.o) ? a.o : null;
@@ -530,7 +643,7 @@
         const x = out.includes(L);
         return (
           `<div class="choice${sel ? ' sel' : ''}${x ? ' out' : ''}">` +
-          `<button type="button" class="choice-btn" data-act="choose" data-l="${L}" role="radio" aria-checked="${sel}"><span class="choice-letter">${L}</span><span class="choice-text">${c}</span></button>` +
+          `<button type="button" class="choice-btn" data-act="choose" data-l="${L}" role="radio" aria-checked="${sel}"><span class="choice-letter">${L}</span><span class="choice-text">${choiceContent(c)}</span></button>` +
           (x
             ? `<button type="button" class="choice-undo" data-act="uncross" data-l="${L}" aria-label="Undo cross out of ${L}">Undo</button>`
             : `<button type="button" class="choice-x" data-act="cross" data-l="${L}" aria-label="Cross out answer choice ${L}"><span class="cx-circle">${L}</span></button>`) +
@@ -538,6 +651,12 @@
         );
       })
       .join('');
+  }
+
+  function choiceContent(c) {
+    if (typeof c === 'string') return c;
+    const imgs = (c.images || []).map((im) => `<img class="choice-img" src="${esc(im.src)}" alt="${esc(im.alt || '')}">`).join('');
+    return `${c.text || ''}${imgs}`;
   }
 
   function refreshChoices() {
@@ -593,8 +712,9 @@
         const a = S.answers[q.id];
         const done = isAnswered(q, a);
         const cur = showCurrent && i === S.qIndex && S.screen === 'question';
+        const locked = S.settings.allowBack === false && i < S.qIndex;
         return (
-          `<button type="button" class="qcell${done ? ' answered' : ''}${cur ? ' current' : ''}" data-act="goto" data-i="${i}" aria-label="Question ${q.number}${done ? ', answered' : ', unanswered'}${a && a.r ? ', marked for review' : ''}">` +
+          `<button type="button"${locked ? ' disabled' : ''} class="qcell${done ? ' answered' : ''}${cur ? ' current' : ''}" data-act="goto" data-i="${i}" aria-label="Question ${q.number}${done ? ', answered' : ', unanswered'}${a && a.r ? ', marked for review' : ''}">` +
           (cur ? `<span class="cell-pin">${icon.pin}</span>` : '') +
           `<span>${q.number}</span>` +
           (a && a.r ? `<span class="cell-flag">${icon.flagSmall}</span>` : '') +
@@ -769,6 +889,7 @@
         closePopovers();
         break;
       case 'timer':
+        if (app.querySelector('.tu-head.under-warn')) break;
         S.timerHidden = !S.timerHidden;
         syncTimerVisibility();
         break;
@@ -843,6 +964,20 @@
       case 'jump':
         jumpToRef();
         break;
+      case 'zoom':
+        openLightbox(b.dataset.src);
+        break;
+      case 'close-warn':
+        closeTimeWarning();
+        break;
+      case 'results':
+        S.showResults = true;
+        render();
+        break;
+      case 'finish':
+        S.showResults = false;
+        render();
+        break;
       case 'doc': {
         const p = s.passages[passageIdFor(s, q)];
         S.docIdx[`${s.index}:${p.id}`] = Number(b.dataset.i);
@@ -886,6 +1021,17 @@
       default:
         break;
     }
+  });
+
+  app.addEventListener('input', (e) => {
+    const inp = e.target.closest && e.target.closest('.spr-input');
+    if (!inp || !S.attempt || S.attempt.phase !== 'section') return;
+    const q = sec().questions[S.qIndex];
+    if (!q || q.type !== 'input') return;
+    ans(q.id).v = inp.value;
+    const pv = S.el.body.querySelector('.spr-val');
+    if (pv) pv.textContent = inp.value;
+    markDirty(q.id);
   });
 
   function jumpToRef() {
@@ -1078,7 +1224,49 @@
       '<p>Your test is complete, and your answers have been submitted.</p>' +
       `<div class="fin-card">${icon.laptopSmile}<p>Your proctor will let you know when it’s time to leave.<br>Please stay quiet; others may still be testing.</p></div>` +
       '<button type="button" class="btn-yellow" data-act="home">Return to Homepage</button>' +
+      (S.results ? '<div><button type="button" class="btn-outline fin-results" data-act="results">View Your Results</button></div>' : '') +
       '</div></div>';
+  }
+
+  function renderResults() {
+    const r = S.results;
+    const sc = r.score;
+    const top = `<div class="fin-top"><div class="fin-top-in"><button type="button" data-act="finish">${icon.chevLeft}<span>Back</span></button><button type="button" data-act="home"><span>Return to Home</span>${icon.home}</button></div></div>`;
+    let h = '<div class="page res">' + top + '<div class="res-main"><h1>Your Results</h1>';
+    h += sc.keyed
+      ? `<p class="res-total">You got <b>${sc.correct} of ${sc.keyed}</b> scored questions right (${Math.round((sc.correct / sc.keyed) * 100)}%).</p>`
+      : '<p class="res-total">Your answers were submitted. This test doesn’t have automatic scoring.</p>';
+    r.sections.forEach((s, si) => {
+      const title = esc(S.test.sections[si] ? S.test.sections[si].title : s.title);
+      h += `<section class="res-sec"><div class="res-sec-head"><h2>${title}</h2><span>${s.keyed ? `${s.correct}/${s.keyed} correct · ` : ''}${s.answered}/${s.total} answered</span></div>`;
+      if (r.mode === 'full' && s.questions && s.questions.length) {
+        h += '<ol class="res-list">';
+        for (const it of s.questions) {
+          const cls = it.correct === true ? 'ok' : it.correct === false ? 'bad' : 'na';
+          const badge = it.correct === true ? 'Correct' : it.correct === false ? (it.given ? 'Incorrect' : 'Blank') : 'Not scored';
+          const letterText = (L) => {
+            if (!L || !it.choices) return '';
+            const t = it.choices['ABCDEFGH'.indexOf(L)];
+            return t ? ` — ${esc(t.length > 90 ? t.slice(0, 88) + '…' : t)}` : '';
+          };
+          let ansLine = '';
+          if (it.type === 'mcq' || it.type === 'input') {
+            ansLine = `Your answer: <b>${it.given ? esc(it.given) : '—'}</b>${it.type === 'mcq' ? letterText(it.given) : ''}`;
+            if (it.answer) ansLine += `<br>Correct answer: <b>${esc(it.answer)}</b>${it.type === 'mcq' ? letterText(it.answer) : ''}`;
+          } else ansLine = it.given ? 'Response submitted for scoring by your proctor.' : 'No response.';
+          h +=
+            `<li class="${cls}"><span class="rn">${it.number}</span><div class="rb">` +
+            (it.prompt ? `<div class="rp">${esc(it.prompt)}</div>` : '') +
+            `<div class="ra">${ansLine}</div>` +
+            (it.explanation ? `<div class="rx">${it.explanation}</div>` : '') +
+            `</div><span class="rbadge">${badge}</span></li>`;
+        }
+        h += '</ol>';
+      }
+      h += '</section>';
+    });
+    h += '<div class="res-actions"><button type="button" class="btn-yellow" data-act="home">Return to Homepage</button></div></div></div>';
+    app.innerHTML = h;
   }
 
   let pausedPoll = null;
@@ -1130,7 +1318,16 @@
     document.addEventListener('copy', blocked);
     document.addEventListener('cut', blocked);
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closePopovers();
+      if (e.key === 'Escape') {
+        closePopovers();
+        document.querySelectorAll('.lightbox').forEach((n) => n.remove());
+      }
+      if ((e.ctrlKey || e.metaKey) && e.altKey && (e.key === 't' || e.key === 'T' || e.code === 'KeyT')) {
+        if (app.querySelector('.time-warn')) {
+          e.preventDefault();
+          closeTimeWarning();
+        }
+      }
     });
   }
 

@@ -38,7 +38,7 @@
     if (a && a.status === 'completed') {
       cls = 'done';
       status = '<b>Completed</b> — answers submitted';
-      button = '';
+      button = t.showResults && t.showResults !== 'none' ? `<a class="btn-plain" href="/exam?attempt=${a.id}&view=results">View Results</a>` : '';
     } else if (a && a.status === 'paused') {
       cls = 'paused';
       status = '<b>Paused</b> — ask your proctor to let you back in';
